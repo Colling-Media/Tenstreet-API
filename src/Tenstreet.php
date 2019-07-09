@@ -2,7 +2,9 @@
     
     namespace CollingMedia\Tenstreet;
     
+    use CollingMedia\Tenstreet\Exceptions\ValidationFailedException;
     use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Validator;
 
     /**
      * Class Tenstreet
@@ -67,11 +69,8 @@
          * Set the source of the lead to send.
          *
          * @param string $source
-         *
          * @return \CollingMedia\Tenstreet\Tenstreet
-         *
          * @since 1.0.0
-         *
          */
         public function setSource (string $source)
         {
@@ -89,12 +88,47 @@
          * validation, it returns the validation
          * errors.
          *
-         * @since 1.0.0
-         *
          * @param \Illuminate\Http\Request $request
+         * @return array
+         * @throws \CollingMedia\Tenstreet\Exceptions\ValidationFailedException
+         * @since 1.0.0
          */
         public function parseRequest (Request $request)
         {
-        
+            // Setup the variables for the function
+            $validations = [];
+            $displayFields = [];
+            $customQuestions = [];
+            
+            // Loop through the fields from the config and parse out the custom questions and display fields
+            foreach ($this->fields AS $field => $validation) {
+                $check = explode($validation, '|');
+                foreach ($check AS $item) {
+                    if(strpos($item, 'customQuestion') !== false) {
+                        $cq = explode($item, ':');
+                        $customQuestions[$field] = [
+                            'id' => $cq[1],
+                            'question' => $cq[2]
+                        ];
+                        unset($check[$item]);
+                    }
+                    if(strpos($item, 'displayField') !== false) {
+                        $df = explode($item, ':');
+                        $displayFields[$field] = [
+                            'name' => $df[1],
+                        ];
+                        unset($check[$item]);
+                    }
+                }
+                $validations[$field] = implode($check, '|');
+            }
+            
+            $validator = Validator::make($request->all(), $validations);
+            
+            if($validator->fails()) {
+                throw new ValidationFailedException($validator->errors()->toArray());
+            }
+            
+            return $validator->validated();
         }
     }
