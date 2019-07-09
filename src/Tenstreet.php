@@ -6,6 +6,7 @@
     use CollingMedia\Tenstreet\Exceptions\ValidationFailedException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Validator;
+    use GuzzleHttp\Client;
 
     /**
      * Class Tenstreet
@@ -50,6 +51,31 @@
         private $source = null;
     
         /**
+         * The endpoint used for posting.
+         *
+         * @var string|null
+         */
+        private $endpoint = null;
+    
+        /**
+         * The mode used for posting.
+         * DEV is for development
+         * PROD is for production
+         *
+         * @var string|null
+         */
+        private $mode = null;
+    
+        /**
+         * The submissing return used
+         * as defined and explained
+         * in the config file.
+         *
+         * @var string|null
+         */
+        private $submission_return = null;
+    
+        /**
          * Tenstreet constructor.
          *
          * @return void
@@ -62,6 +88,9 @@
             $this->api_key = config('tenstreet.api_key');
             $this->company_id = config('tenstreet.company_id');
             $this->source = config('tenstreet.source');
+            $this->endpoint = config('tenstreet.endpoint');
+            $this->mode = config('tenstreet.mode');
+            $this->submission_return = config('tenstreet.submission_return');
         }
     
         /**
@@ -73,7 +102,7 @@
          * @return \CollingMedia\Tenstreet\Tenstreet
          * @since 1.0.0
          */
-        public function setSource (string $source)
+        public function setSource (string $source): self
         {
             $this->source = $source;
             return $this;
@@ -90,11 +119,14 @@
          * errors.
          *
          * @param \Illuminate\Http\Request $request
+         * @param bool                     $submit
+         *
          * @return array
          * @throws \CollingMedia\Tenstreet\Exceptions\ValidationFailedException
+         * @throws \CollingMedia\Tenstreet\Exceptions\InvalidDataException
          * @since 1.0.0
          */
-        public function parseRequest (Request $request)
+        public function parseRequest (Request $request, $submit = false): array
         {
             // Setup the variables for the function
             $validations = [];
@@ -129,8 +161,12 @@
             if($validator->fails()) {
                 throw new ValidationFailedException($validator->errors()->toArray());
             }
+            if($submit) {
+                return $this->submitLead($validator->validated());
+            } else {
+                return $validator->validated();
+            }
             
-            return $validator->validated();
         }
     
         /**
@@ -162,10 +198,13 @@
          * parsing anything.
          *
          * @param array|string|\SimpleXMLElement $data
+         *
+         * @return array|string
          * @throws \CollingMedia\Tenstreet\Exceptions\InvalidDataException
          * @since 1.0.0
          */
-        public function submitLead($data) {
+        public function submitLead($data): mixed
+        {
             
             // ARRAY LOGIC
             if (is_array($data))
@@ -186,5 +225,30 @@
             }
             
             throw new InvalidDataException();
+        }
+    
+        /**
+         * Post
+         *
+         * Post the provided data to
+         * Tenstreet with the correct
+         * headers set.
+         *
+         * @param string $data
+         * @param array  $options !!Not Yet Implemented!!
+         *
+         * @return \Psr\Http\Message\ResponseInterface
+         * @since 1.0.0
+         */
+        protected  function post(string $data, $options = [])
+        {
+            $client = new Client();
+            $response = $client->post($this->endpoint, [
+                'headers' => [
+                    'Content-Type' => 'text/xml; charset=utf8'
+                ],
+                'body' => $data,
+            ]);
+            return $response;
         }
     }

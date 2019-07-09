@@ -6,19 +6,71 @@ return [
      * The API Key is provided from Tenstreet.
      * They should provide you one.
      */
-    'api_key' => env("TENSTREET_API_KEY", ''),
+    'api_key' => env("TENSTREET_API_KEY", null),
     
     /**
      * The Company ID is the ID that is assigned
      * to your company by Tenstreet.
      */
-    'company_id' => env("TENSTREET_COMPANY_ID", ''),
+    'company_id' => env("TENSTREET_COMPANY_ID", null),
     
     /**
      * The source must be approved by Tenstreet
      * and tied to the API Key they provide you.
      */
-    'source' => env("TENSTREET_SOURCE", ''),
+    'source' => env("TENSTREET_SOURCE", null),
+    
+    /**
+     * The mode is either DEV or PROD.
+     *
+     * If you set this to DEV, we replace the
+     * Company ID with the Test Company ID (15),
+     * and we will return the full response from
+     * Tenstreet.
+     *
+     * If you set this to PROD, we use the
+     * Company ID provided, and only return
+     * a boolean unless you specify otherwise.
+     */
+    'mode' => env("TENSTREET_MODE", 'PROD'),
+    
+    /**
+     * The submission return defines what
+     * you get as a response from the
+     * submitLead() function. It can either
+     * be short or full.
+     *
+     * Short will read the response from
+     * Tenstreet, and if it registers as
+     * accepted, it will return an array with
+     * the two keys:
+     * [
+     *  'accepted' => true/false,
+     *  'subject_id' => string
+     * ]
+     *
+     * The Subject ID is the Tenstreet
+     * assigned ID for the lead. This ID
+     * allows you to update or find a lead
+     * later on.
+     *
+     * Full will return the full XML
+     * response as a string, for you to
+     * decode and use as you want.
+     */
+    'submission_return' => env("TENSTREET_SUBMISSION_RETURN", 'short'),
+    
+    /**
+     * The only reason we provide the
+     * ability to edit the endpoint is
+     * for you to debug what the XML you
+     * create looks like. Otherwise, it
+     * should remain unchanged.
+     *
+     * The default value is:
+     * https://dashboard.tenstreet.com/post/
+     */
+    'endpoint' => 'https://dashboard.tenstreet.com/post/',
     
     
     /**
