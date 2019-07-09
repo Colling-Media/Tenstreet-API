@@ -38,6 +38,12 @@ return [
      * look like. We parse through the validation
      * rules and extract where they should go based
      * on what is included.
+     *
+     * If you plan on adding custom fields, that
+     * you also want to pass through Laravel Validation,
+     * you can read up on it here:
+     *
+     * https://laravel.com/docs/5.8/validation#available-validation-rules
      */
     'fields' => [
         /**
@@ -49,13 +55,21 @@ return [
          * a lead. All others are optional,
          * and have what we suggest as the
          * best validations for the fields.
+         *
+         * The phone numbers passed must be
+         * in ***-***-**** format. You can
+         * use the included helper function
+         * to format the phone number if
+         * you would like:
+         *
+         * $cleanNumber = format_phone($dirtyNumber);
          */
         'first_name' => 'required|max:255',
         'last_name' => 'required|max:255',
         'email' => 'required|email',
         'referrer' => 'required|max:255',
-        'primary_phone' => '',
-        'secondary_phone' => '',
+        'primary_phone' => 'required|max:12',
+        'secondary_phone' => 'max:12',
         'city' => '',
         'state' => '',
         'zip_code' => 'max:5',
@@ -70,8 +84,8 @@ return [
          * If the CDL Number is provided,
          * the CDL Issuing State is required.
          */
-        'cdl_number' => '',
-        'cdl_issuing_state' => '',
+        'cdl_number' => 'required_with:cdl_issuing_state',
+        'cdl_issuing_state' => 'required_with:cdl_number',
         
         /**
          * Social Security Numbers
