@@ -40,9 +40,38 @@ return [
      * on what is included.
      */
     'fields' => [
+        /**
+         * Basic Fields
+         * These fields are available
+         * by default to all API users.
+         * The ones marked Required are
+         * required by Tenstreet to create
+         * a lead. All others are optional,
+         * and have what we suggest as the
+         * best validations for the fields.
+         */
         'first_name' => 'required|max:255',
         'last_name' => 'required|max:255',
         'email' => 'required|email',
+        'referrer' => 'required|max:255',
+        'primary_phone' => '',
+        'secondary_phone' => '',
+        'city' => '',
+        'state' => '',
+        'zip_code' => 'max:5',
+    
+    
+        /**
+         * CDL Information
+         * The CDL information, if provided,
+         * is automatically put into the
+         * licenses fields in Tenstreet.
+         *
+         * If the CDL Number is provided,
+         * the CDL Issuing State is required.
+         */
+        'cdl_number' => '',
+        'cdl_issuing_state' => '',
         
         /**
          * Social Security Numbers
