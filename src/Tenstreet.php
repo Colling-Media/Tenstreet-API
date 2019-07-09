@@ -2,6 +2,7 @@
     
     namespace CollingMedia\Tenstreet;
     
+    use CollingMedia\Tenstreet\Exceptions\InvalidDataException;
     use CollingMedia\Tenstreet\Exceptions\ValidationFailedException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Validator;
@@ -130,5 +131,60 @@
             }
             
             return $validator->validated();
+        }
+    
+        /**
+         * Submit Lead
+         *
+         * Submit the lead to Tenstreet!
+         *
+         *
+         * This takes an array if you would
+         * like to bypass the parsing
+         * and validation that is built
+         * into the package.
+         *
+         * You will still need to put the
+         * correct keys in place though, in
+         * reference to the config file
+         * under tenstreet.fields.
+         *
+         * The key names are specific due
+         * to Tenstreet's API being temperamental
+         * about how exactly the whole thing is
+         * laid out.
+         *
+         * You have the option to also pass
+         * an XML string or SimpleXML object.
+         * If you pass XML directly, we post
+         * exactly what you have given straight
+         * to Tenstreet, without correcting or
+         * parsing anything.
+         *
+         * @param array|string|\SimpleXMLElement $data
+         * @throws \CollingMedia\Tenstreet\Exceptions\InvalidDataException
+         * @since 1.0.0
+         */
+        public function submitLead($data) {
+            
+            // ARRAY LOGIC
+            if (is_array($data))
+            {
+                // TODO:: Implement the Array to XML then Post
+            }
+            
+            // STRING LOGIC
+            if (is_string($data))
+            {
+                // TODO:: Implement the String post
+            }
+            
+            // SIMPLEXML LOGIC
+            if (get_class($data) == \SimpleXMLElement::class)
+            {
+                // TODO:: Implement the SimpleXML Post
+            }
+            
+            throw new InvalidDataException();
         }
     }
